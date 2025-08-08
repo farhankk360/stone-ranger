@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>2D Platformer Game - Final Project</title>
+
+    <!-- Load p5.js library first -->
+    <script src="p5.min.js"></script>
+
+    <!-- Load game components in dependency order -->
+    <script src="components/platform.js"></script>
+    <script src="components/player.js"></script>
+    <script src="components/enemy.js"></script>
+    <script src="components/projectile.js"></script>
+    <script src="components/collectable.js"></script>
+    <script src="components/game-manager.js"></script>
+
+    <!-- Load main game file last -->
+    <script src="sketch.js"></script>
+
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+        background: linear-gradient(135deg, #2c3e50, #3498db);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-family: Arial, sans-serif;
+      }
+
+      main {
+        border: 3px solid #34495e;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        background: #2c3e50;
+        padding: 10px;
+      }
+
+      .game-info {
+        text-align: center;
+        color: #ecf0f1;
+        margin-bottom: 10px;
+        font-size: 18px;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .controls-hint {
+        text-align: center;
+        color: #bdc3c7;
+        margin-top: 10px;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="game-info">2D Platformer Adventure</div>
+      <div id="game-container"></div>
+      <div class="controls-hint">
+        WASD/Arrows: Move | Move + Space: Throw Stones | R: Restart
+      </div>
+    </main>
+  </body>
+</html>
