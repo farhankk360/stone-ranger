@@ -64,12 +64,10 @@ function Enemy(x, y, patrolDistance, type = "walker") {
    * Updates enemy physics including gravity and platform collision
    */
   this.updatePhysics = function () {
-    // Simple falling physics like player
     if (!this.isOnGround) {
-      this.y += 5 // Same falling speed as player
+      this.y += 5
     }
 
-    // Check if we're on a platform (external collision detection)
     this.isOnGround = false
     for (const platform of platforms) {
       if (platform.isContact(this.x, this.y)) {
@@ -78,11 +76,9 @@ function Enemy(x, y, patrolDistance, type = "walker") {
       }
     }
 
-    // If enemy falls off the world, respawn at start position
     if (this.y > floorPosY + 200) {
       this.x = this.startX
       this.y = this.startX < 1300 ? floorPosY : floorPosY - 120
-      this.velocityY = 0
     }
   }
 
@@ -90,13 +86,10 @@ function Enemy(x, y, patrolDistance, type = "walker") {
    * Basic walking patrol behavior
    */
   this.updateWalker = function () {
-    // Only move if on solid ground
     if (!this.isOnGround) return
 
-    // Calculate next position
     const nextX = this.x + this.speed * this.direction
 
-    // Check if next position would be on a platform
     let willBeOnPlatform = false
     for (const platform of platforms) {
       if (platform.isContact(nextX, this.y)) {
@@ -105,7 +98,6 @@ function Enemy(x, y, patrolDistance, type = "walker") {
       }
     }
 
-    // Reverse direction if would fall off or hit patrol boundary
     if (
       !willBeOnPlatform ||
       nextX >= this.startX + this.patrolDistance ||
@@ -113,7 +105,6 @@ function Enemy(x, y, patrolDistance, type = "walker") {
     ) {
       this.direction *= -1
     } else {
-      // Move horizontally
       this.x = nextX
     }
   }
@@ -122,7 +113,6 @@ function Enemy(x, y, patrolDistance, type = "walker") {
    * Stationary guard behavior - doesn't move much
    */
   this.updateGuard = function () {
-    // Slight swaying motion
     const sway = Math.sin(this.animationFrame * 2) * 2
     this.x = this.startX + sway
   }
