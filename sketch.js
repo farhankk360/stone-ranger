@@ -16,7 +16,6 @@ let cameraPosX = 0
 let cameraPosY = 0
 
 // Background elements
-let treesX
 let clouds
 let sharpMountains = []
 let rollingMountainLayers = []
@@ -30,24 +29,11 @@ function setup() {
   floorPosY = (height * 3) / 4
   floorWidth = width * 2
 
-  // Initialize game manager
-  gameManager = new GameManager()
+  // Initialize game state manager
+  gameManager = new GameStateManager()
 
-  // Initialize tree positions
-  treesX = [300, 400, 600, 800, 900, 1050, 1100, 1300, 1600]
-
-  // Create collectables using CollectableManager
-  const collectablePositions = [
-    { x: 100, y: floorPosY - 30 },
-    { x: 800, y: floorPosY - 30 },
-    { x: 1200, y: floorPosY - 30 },
-    { x: 1500, y: floorPosY - 30 },
-    { x: 1350, y: floorPosY - 100 }, // On platform
-    { x: 650, y: floorPosY - 80 }, // Floating
-  ]
-
-  collectables = CollectableManager.createSet(collectablePositions)
-  gameManager.init(collectables.length)
+  // Create collectables
+  initializeCollectables()
 
   // Create flagpole
   flagpole = { x_pos: 1900, isReached: false }
@@ -58,12 +44,12 @@ function setup() {
     Platform(1410, height - floorPosY, 200, floorPosY),
     Platform(600, height - floorPosY, 1720, floorPosY),
     // Additional platforms for more interesting level design
-    Platform(200, 40, 500, floorPosY - 80),
-    Platform(200, 40, 600, floorPosY - 180),
-    Platform(200, 40, 700, floorPosY - 280),
-    Platform(200, 40, 800, floorPosY - 350),
-    Platform(200, 40, 900, floorPosY - 450),
-    // Platform(150, 30, 1300, floorPosY - 120),
+    // Platform(200, 40, 500, floorPosY - 80),
+    // Platform(200, 40, 600, floorPosY - 180),
+    // Platform(200, 40, 700, floorPosY - 280),
+    // Platform(200, 40, 800, floorPosY - 350),
+    // Platform(200, 40, 900, floorPosY - 450),
+    // // Platform(150, 30, 1300, floorPosY - 120),
   ]
 
   // Create enemies using constructor functions
@@ -87,6 +73,20 @@ function initializeEnemies() {
   ]
 }
 
+function initializeCollectables() {
+  const collectablePositions = [
+    { x: 100, y: floorPosY - 30 },
+    { x: 800, y: floorPosY - 30 },
+    { x: 1200, y: floorPosY - 30 },
+    { x: 1500, y: floorPosY - 30 },
+    { x: 1350, y: floorPosY - 100 }, // On platform
+    { x: 650, y: floorPosY - 80 }, // Floating
+  ]
+
+  collectables = new Collectables(collectablePositions)
+  gameManager.init(collectables.getCount())
+}
+
 function startGame() {
   // Create player using constructor function
   player = new Player(width / 2, floorPosY, floorPosY)
@@ -108,15 +108,7 @@ function resetGameWorld() {
   flagpole.isReached = false
 
   // Reset collectables
-  const collectablePositions = [
-    { x: 100, y: floorPosY - 30 },
-    { x: 800, y: floorPosY - 30 },
-    { x: 1200, y: floorPosY - 30 },
-    { x: 1500, y: floorPosY - 30 },
-    { x: 1350, y: floorPosY - 100 }, // On platform
-    { x: 650, y: floorPosY - 80 }, // Floating
-  ]
-  collectables = CollectableManager.createSet(collectablePositions)
+  initializeCollectables()
 }
 
 // ============= BACKGROUND INITIALIZATION =============
@@ -282,6 +274,9 @@ function updateGameLogic() {
   // Update player
   player.update(floorWidth)
 
+  // Update collectables
+  collectables.updateAll()
+
   // Update enemies
   for (let i = enemies.length - 1; i >= 0; i--) {
     const enemy = enemies[i]
@@ -385,14 +380,10 @@ function updateGameLogic() {
     }
   }
 
-  // Update collectables
-  for (const collectable of collectables) {
-    CollectableManager.update(collectable)
-
-    if (CollectableManager.checkCollection(collectable, player)) {
-      const points = CollectableManager.getPointValue(collectable.type)
-      gameManager.collectableFound(points)
-    }
+  // Check collections and handle scoring
+  const collected = collectables.checkAllCollections(player)
+  for (const collection of collected) {
+    gameManager.collectableFound(collection.points)
   }
 
   // Check flagpole
@@ -437,9 +428,7 @@ function drawGameEntities() {
   }
 
   // Draw collectables
-  for (const collectable of collectables) {
-    CollectableManager.draw(collectable)
-  }
+  collectables.drawAll()
 
   // Draw enemies
   for (const enemy of enemies) {
@@ -605,6 +594,7 @@ function drawClouds() {
 
 function drawParallaxTrees() {
   // Background trees (slower parallax)
+  const treesX = [300, 400, 600, 800, 900, 1050, 1100, 1300, 1600]
   push()
   const bgParallax = -cameraPosX * 0.05
   translate(bgParallax, 0)

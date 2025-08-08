@@ -1,101 +1,88 @@
 /**
- * Creates and manages collectable coins in the game
- * Simple object-based approach for managing collectables
+ * Individual collectable object
+ * @param {number} x - X position
+ * @param {number} y - Y position
+ * @param {number} size - Size of the collectable
+ * @param {string} type - Type of collectable ('coin', 'gem', 'powerup')
  */
-const CollectableManager = {
-  /**
-   * Creates a new collectable object
-   * @param {number} x - X position
-   * @param {number} y - Y position
-   * @param {number} size - Size of the collectable
-   * @param {string} type - Type of collectable ('coin', 'gem', 'powerup')
-   * @returns {Object} Collectable object
-   */
-  create: function (x, y, size = 40, type = "coin") {
-    return {
-      x_pos: x,
-      y_pos: y,
-      size: size,
-      type: type,
-      isFound: false,
-      animationFrame: 0,
-      bobOffset: Math.random() * TWO_PI, // Random start for bobbing animation
-      sparkles: [],
-    }
-  },
+function Collectable(x, y, size = 40, type = "coin") {
+  this.x_pos = x
+  this.y_pos = y
+  this.size = size
+  this.type = type
+  this.isFound = false
+  this.animationFrame = 0
+  this.bobOffset = Math.random() * TWO_PI // Random start for bobbing animation
+  this.sparkles = []
 
   /**
    * Updates collectable animations
-   * @param {Object} collectable - The collectable to update
    */
-  update: function (collectable) {
-    if (collectable.isFound) return
+  this.update = function () {
+    if (this.isFound) return
 
-    collectable.animationFrame += 0.1
+    this.animationFrame += 0.1
 
     // Create sparkle effects occasionally
     if (Math.random() < 0.1) {
-      collectable.sparkles.push({
-        x: collectable.x_pos + (Math.random() - 0.5) * collectable.size,
-        y: collectable.y_pos + (Math.random() - 0.5) * collectable.size,
+      this.sparkles.push({
+        x: this.x_pos + (Math.random() - 0.5) * this.size,
+        y: this.y_pos + (Math.random() - 0.5) * this.size,
         life: 30,
         maxLife: 30,
       })
     }
 
     // Update sparkles
-    for (let i = collectable.sparkles.length - 1; i >= 0; i--) {
-      const sparkle = collectable.sparkles[i]
+    for (let i = this.sparkles.length - 1; i >= 0; i--) {
+      const sparkle = this.sparkles[i]
       sparkle.life--
       sparkle.y -= 1
 
       if (sparkle.life <= 0) {
-        collectable.sparkles.splice(i, 1)
+        this.sparkles.splice(i, 1)
       }
     }
-  },
+  }
 
   /**
    * Draws a collectable if not yet found
-   * @param {Object} collectable - The collectable object to draw
    */
-  draw: function (collectable) {
-    if (collectable.isFound) return
+  this.draw = function () {
+    if (this.isFound) return
 
     push()
 
     // Bobbing animation
-    const bobAmount =
-      sin(collectable.animationFrame + collectable.bobOffset) * 3
-    const currentY = collectable.y_pos + bobAmount
+    const bobAmount = sin(this.animationFrame + this.bobOffset) * 3
+    const currentY = this.y_pos + bobAmount
 
-    translate(collectable.x_pos, currentY)
+    translate(this.x_pos, currentY)
 
     // Draw sparkles first (behind coin)
-    this.drawSparkles(collectable)
+    this.drawSparkles()
 
     // Draw based on type
-    switch (collectable.type) {
+    switch (this.type) {
       case "coin":
-        this.drawCoin(collectable.size)
+        this.drawCoin(this.size)
         break
       case "gem":
-        this.drawGem(collectable.size)
+        this.drawGem(this.size)
         break
       case "powerup":
-        this.drawPowerup(collectable.size)
+        this.drawPowerup(this.size)
         break
     }
 
     pop()
-  },
+  }
 
   /**
    * Draws sparkle effects around collectable
-   * @param {Object} collectable - The collectable object
    */
-  drawSparkles: function (collectable) {
-    for (const sparkle of collectable.sparkles) {
+  this.drawSparkles = function () {
+    for (const sparkle of this.sparkles) {
       const alpha = map(sparkle.life, 0, sparkle.maxLife, 0, 255)
       const size = map(sparkle.life, 0, sparkle.maxLife, 1, 4)
 
@@ -103,13 +90,9 @@ const CollectableManager = {
       noStroke()
 
       // Draw sparkle as a small star
-      this.drawStar(
-        sparkle.x - collectable.x_pos,
-        sparkle.y - collectable.y_pos,
-        size
-      )
+      this.drawStar(sparkle.x - this.x_pos, sparkle.y - this.y_pos, size)
     }
-  },
+  }
 
   /**
    * Draws a small star shape
@@ -117,7 +100,7 @@ const CollectableManager = {
    * @param {number} y - Y position relative to origin
    * @param {number} size - Size of the star
    */
-  drawStar: function (x, y, size) {
+  this.drawStar = function (x, y, size) {
     push()
     translate(x, y)
     beginShape()
@@ -130,13 +113,13 @@ const CollectableManager = {
     }
     endShape(CLOSE)
     pop()
-  },
+  }
 
   /**
    * Draws a coin collectable
    * @param {number} size - Size of the coin
    */
-  drawCoin: function (size) {
+  this.drawCoin = function (size) {
     // Outer ring
     stroke(0)
     strokeWeight(1)
@@ -157,13 +140,13 @@ const CollectableManager = {
     // Highlight effect
     fill(255, 255, 255, 100)
     ellipse(-size * 0.2, -size * 0.2, size * 0.3, size * 0.3)
-  },
+  }
 
   /**
    * Draws a gem collectable (worth more points)
    * @param {number} size - Size of the gem
    */
-  drawGem: function (size) {
+  this.drawGem = function (size) {
     // Gem body
     fill(138, 43, 226) // Blue violet
     stroke(75, 0, 130)
@@ -183,13 +166,13 @@ const CollectableManager = {
     noStroke()
     triangle(0, -size * 0.4, size * 0.2, -size * 0.1, 0, size * 0.1)
     triangle(0, -size * 0.4, -size * 0.2, -size * 0.1, 0, size * 0.1)
-  },
+  }
 
   /**
    * Draws a powerup collectable (special abilities)
    * @param {number} size - Size of the powerup
    */
-  drawPowerup: function (size) {
+  this.drawPowerup = function (size) {
     // Powerup body (star shape)
     fill(255, 20, 147) // Deep pink
     stroke(139, 0, 69)
@@ -215,91 +198,98 @@ const CollectableManager = {
     textSize(size * 0.3)
     textAlign(CENTER, CENTER)
     text("!", 0, 0)
-  },
+  }
 
   /**
-   * Checks if the player has collected a collectable
-   * @param {Object} collectable - The collectable to check
+   * Checks if the player has collected this collectable
    * @param {Object} player - The player object
    * @param {number} collectionDistance - Distance for collection (default 50)
    * @returns {boolean} True if collectable was just collected
    */
-  checkCollection: function (collectable, player, collectionDistance = 50) {
-    if (collectable.isFound) return false
+  this.checkCollection = function (player, collectionDistance = 50) {
+    if (this.isFound) return false
 
     const playerPos = player.getPosition()
-    const distance = dist(
-      playerPos.x,
-      playerPos.y,
-      collectable.x_pos,
-      collectable.y_pos
-    )
+    const distance = dist(playerPos.x, playerPos.y, this.x_pos, this.y_pos)
 
     if (distance < collectionDistance) {
-      collectable.isFound = true
-
-      // Create collection effect
-      this.createCollectionEffect(collectable)
-
+      this.isFound = true
       return true
     }
 
     return false
-  },
+  }
 
   /**
-   * Creates a visual effect when collectable is collected
-   * @param {Object} collectable - The collected collectable
-   */
-  createCollectionEffect: function (collectable) {
-    // Create burst of sparkles
-    for (let i = 0; i < 10; i++) {
-      const angle = (TWO_PI / 10) * i
-      const speed = random(2, 6)
-      collectable.sparkles.push({
-        x: collectable.x_pos + cos(angle) * speed * 5,
-        y: collectable.y_pos + sin(angle) * speed * 5,
-        life: 60,
-        maxLife: 60,
-        vx: cos(angle) * speed,
-        vy: sin(angle) * speed - 2, // Upward bias
-      })
-    }
-  },
-
-  /**
-   * Gets the point value for different collectable types
-   * @param {string} type - The type of collectable
+   * Gets the point value for this collectable type
    * @returns {number} Point value
    */
-  getPointValue: function (type) {
+  this.getPointValue = function () {
     const values = {
       coin: 100,
       gem: 500,
       powerup: 1000,
     }
-    return values[type] || 100
-  },
+    return values[this.type] || 100
+  }
+}
+
+/**
+ * Manages collections of collectables
+ * @param {Array} positions - Array of {x, y} position objects (optional)
+ */
+function Collectables(positions = []) {
+  this.collectables = []
+
+  positions.forEach((pos) => {
+    // Occasionally create special collectables
+    let type = "coin"
+    const rand = Math.random()
+    if (rand < 0.05) type = "powerup" // 5% chance for powerup
+    else if (rand < 0.15) type = "gem" // 10% chance for gem
+
+    this.collectables.push(new Collectable(pos.x, pos.y, 40, type))
+  })
+
+  this.updateAll = function () {
+    for (const collectable of this.collectables) {
+      collectable.update()
+    }
+  }
+
+  this.drawAll = function () {
+    for (const collectable of this.collectables) {
+      collectable.draw()
+    }
+  }
 
   /**
-   * Creates a standard set of collectables for a level
-   * @param {Array} positions - Array of {x, y} position objects
-   * @param {string} defaultType - Default collectable type
-   * @returns {Array} Array of collectable objects
+   * Check collection for all collectables against a player
+   * @param {Object} player - The player object
+   * @returns {Array} Array of {collectable, points} for collected items
    */
-  createSet: function (positions, defaultType = "coin") {
-    const collectables = []
-
-    for (const pos of positions) {
-      // Occasionally create special collectables
-      let type = defaultType
-      const rand = Math.random()
-      if (rand < 0.05) type = "powerup" // 5% chance for powerup
-      else if (rand < 0.15) type = "gem" // 10% chance for gem
-
-      collectables.push(this.create(pos.x, pos.y, 40, type))
+  this.checkAllCollections = function (player) {
+    const collected = []
+    for (const collectable of this.collectables) {
+      if (collectable.checkCollection(player)) {
+        collected.push({
+          collectable: collectable,
+          points: collectable.getPointValue(),
+        })
+      }
     }
+    return collected
+  }
 
-    return collectables
-  },
+  this.getCount = function () {
+    return this.collectables.length
+  }
+
+  this.getCollectedCount = function () {
+    return this.collectables.filter((c) => c.isFound).length
+  }
+
+  this.getRemainingCount = function () {
+    return this.collectables.filter((c) => !c.isFound).length
+  }
 }

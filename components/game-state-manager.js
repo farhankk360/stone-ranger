@@ -1,8 +1,8 @@
 /**
- * Game Manager handles game state, scoring, lives, and level progression
- * @returns {Object} GameManager object with state management methods
+ * Game State Manager handles game state, scoring, lives, and level progression
+ * @returns {Object} GameStateManager object with state management methods
  */
-function GameManager() {
+function GameStateManager() {
   // Game state properties
   this.gameScore = 0
   this.lives = 3
