@@ -67,13 +67,7 @@ function setup() {
   ]
 
   // Create enemies using constructor functions
-  enemies = [
-    new Enemy(400, floorPosY, 100, "walker"),
-    new Enemy(1000, floorPosY, 150, "walker"),
-    new Enemy(1400, floorPosY - 120, 80, "guard"), // Guard on platform
-    new Enemy(700, floorPosY, 200, "jumper"),
-    new Enemy(1600, floorPosY, 120, "walker"),
-  ]
+  initializeEnemies()
 
   // Initialize background systems
   initializeSharpMountains()
@@ -81,6 +75,16 @@ function setup() {
   initializeClouds()
 
   startGame()
+}
+
+function initializeEnemies() {
+  enemies = [
+    new Enemy(400, floorPosY, 100, "walker"),
+    new Enemy(1000, floorPosY, 150, "walker"),
+    new Enemy(1400, floorPosY - 120, 80, "guard"), // Guard on platform
+    new Enemy(700, floorPosY, 200, "jumper"),
+    new Enemy(1600, floorPosY, 120, "walker"),
+  ]
 }
 
 function startGame() {
@@ -91,6 +95,28 @@ function startGame() {
   cameraPosY = 0
 
   gameManager.restartLevel()
+}
+
+function resetGameWorld() {
+  // Reset all projectiles
+  projectiles = []
+
+  // Reset all enemies to initial state
+  initializeEnemies()
+
+  // Reset flagpole
+  flagpole.isReached = false
+
+  // Reset collectables
+  const collectablePositions = [
+    { x: 100, y: floorPosY - 30 },
+    { x: 800, y: floorPosY - 30 },
+    { x: 1200, y: floorPosY - 30 },
+    { x: 1500, y: floorPosY - 30 },
+    { x: 1350, y: floorPosY - 100 }, // On platform
+    { x: 650, y: floorPosY - 80 }, // Floating
+  ]
+  collectables = CollectableManager.createSet(collectablePositions)
 }
 
 // ============= BACKGROUND INITIALIZATION =============
@@ -166,7 +192,6 @@ function initializeClouds() {
       height: (Math.random() * 30 + 30) * depth,
       speed: depth * 0.3,
       opacity: 150 + depth * 100,
-      parallaxSpeed: depth * 0.2,
     })
   }
 }
@@ -186,7 +211,7 @@ function draw() {
   drawSun()
   drawSharpMountains()
   drawRollingMountains()
-  drawParallaxClouds()
+  drawClouds()
   drawParallaxTrees()
 
   // Update and draw game entities
@@ -546,12 +571,9 @@ function drawSingleRollingMountain(centerX, baseY, peakHeight, mountainWidth) {
   endShape(CLOSE)
 }
 
-function drawParallaxClouds() {
+function drawClouds() {
   for (const cloud of clouds) {
     push()
-
-    const parallaxOffset = -cameraPosX * cloud.parallaxSpeed
-    translate(parallaxOffset, 0)
 
     cloud.x_pos += cloud.speed
     if (cloud.x_pos > floorWidth + width + 200) {
@@ -713,8 +735,10 @@ function keyPressed() {
   if (key === "r" || key === "R") {
     if (gameManager.getGameState() === "gameOver") {
       gameManager.resetGame()
+      resetGameWorld()
       startGame()
     } else {
+      resetGameWorld()
       startGame()
     }
     return

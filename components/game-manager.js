@@ -55,17 +55,6 @@ function GameManager() {
     if (this.lives <= 0 && this.gameState === "playing") {
       this.gameState = "gameOver"
     }
-
-    // Show message when all collectables found, but don't auto-complete
-    if (
-      this.collectablesFound >= this.totalCollectables &&
-      this.gameState === "playing"
-    ) {
-      if (this.messageTimer <= 0) {
-        // Only show message once
-        this.showMessage("All coins collected! Head to the flagpole!", 180)
-      }
-    }
   }
 
   /**
