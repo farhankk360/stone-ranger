@@ -123,6 +123,7 @@ function Background() {
     this.drawClouds()
     this.drawParallaxTrees(cameraPosX)
     this.drawRollingMountains(cameraPosX)
+    this.drawRiver()
   }
 
   /**
@@ -389,5 +390,14 @@ function Background() {
     )
 
     pop()
+  }
+
+  /**
+   * Draws a simple river
+   */
+  this.drawRiver = function () {
+    fill(115, 216, 198, 150)
+    noStroke()
+    rect(0, this.floorPosY + 80, this.floorWidth, 120)
   }
 }

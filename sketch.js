@@ -56,7 +56,7 @@ function setup() {
 
     new Platform(200, 40, 900, floorPosY - 70),
     new Platform(300, 40, 1150, floorPosY - 120),
-    new Platform(150, 40, 1500, floorPosY - 190),
+    new Platform(150, 40, 1500, floorPosY - 180),
 
     new Platform(500, height - floorPosY, 1900, floorPosY),
 
@@ -143,8 +143,7 @@ function initializeCollectables() {
 
 function startGame() {
   // Create player using constructor function
-  // player = new Player(0, floorPosY, floorPosY)
-  player = new Player(4600, floorPosY - 550, floorPosY)
+  player = new Player(0, floorPosY, floorPosY)
 
   cameraPosX = 0
   cameraPosY = 0
@@ -438,6 +437,9 @@ function drawGameEntities() {
   // Draw flagpole
   drawFlagpole()
 
+  // Draw house
+  drawHouse()
+
   // Draw player
   player.draw()
 }
@@ -473,6 +475,32 @@ function drawFlagpole() {
   noStroke()
   fill(139, 69, 19)
   rect(flagpole.x_pos - 10, floorPosY, 20, 10)
+}
+
+function drawHouse() {
+  // Roof
+  fill(139, 69, 19) // Brown
+  triangle(
+    flagpole.x_pos + 100,
+    floorPosY - 150,
+    flagpole.x_pos + 200,
+    floorPosY - 250,
+    flagpole.x_pos + 300,
+    floorPosY - 150
+  )
+
+  // // Body
+  fill(255, 222, 173) // Light beige
+  rect(flagpole.x_pos + 100, floorPosY - 150, 200, 150)
+
+  // Window
+  fill(173, 216, 230) // Light blue
+  rect(flagpole.x_pos + 120, floorPosY - 130, 40, 40)
+  rect(flagpole.x_pos + 240, floorPosY - 130, 40, 40)
+
+  // Door
+  fill(139, 69, 19) // Brown
+  rect(flagpole.x_pos + 180, floorPosY - 60, 40, 60)
 }
 
 function checkFlagpole() {

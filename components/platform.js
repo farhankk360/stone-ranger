@@ -1,5 +1,5 @@
 /**
- * Factory function to create platform objects with collision detection
+ * Constructor function to create platform objects with collision detection
  * @param {number} w - Platform width
  * @param {number} h - Platform height
  * @param {number} x - Platform x position
@@ -12,28 +12,27 @@
  * @returns {Object} Platform object with drawPlatform, isContact, and update methods
  */
 function Platform(w, h, x, y, config = {}) {
-  const platform = {
-    w: w,
-    h: h,
-    x: x,
-    y: y,
-    startX: x,
-    startY: y,
+  // Platform properties
+  this.w = w
+  this.h = h
+  this.x = x
+  this.y = y
+  this.startX = x
+  this.startY = y
 
-    // Movement properties
-    isMoving: config.isMoving || false,
-    moveDistance: config.moveDistance || 100,
-    speed: config.speed || 1,
-    moveDirection: config.moveDirection || "horizontal",
-    direction: 1, // 1 for positive direction, -1 for negative
-  }
+  // Movement properties
+  this.isMoving = config.isMoving || false
+  this.moveDistance = config.moveDistance || 100
+  this.speed = config.speed || 1
+  this.moveDirection = config.moveDirection || "horizontal"
+  this.direction = 1 // 1 for positive direction, -1 for negative
 
   // Generate random stones for texture (done once at creation)
-  const stones = []
+  this.stones = []
   for (let i = 0; i < 15; i++) {
-    stones.push({
-      x: Math.random() * (platform.w - 34) + 10, // Relative to platform
-      y: Math.random() * (platform.h - 34) + 10, // Relative to platform
+    this.stones.push({
+      x: Math.random() * (this.w - 34) + 10, // Relative to platform
+      y: Math.random() * (this.h - 34) + 10, // Relative to platform
       w: Math.random() * 12 + 12,
       h: Math.random() * 12 + 12,
     })
@@ -43,7 +42,7 @@ function Platform(w, h, x, y, config = {}) {
    * Updates platform position if it's a moving platform
    * @returns {Object} Movement delta {deltaX, deltaY} for entities to follow
    */
-  platform.update = function () {
+  this.update = function () {
     if (!this.isMoving) return { deltaX: 0, deltaY: 0 }
 
     const oldX = this.x
@@ -85,7 +84,7 @@ function Platform(w, h, x, y, config = {}) {
   /**
    * Draws the platform with grass texture and stone details
    */
-  platform.drawPlatform = function () {
+  this.drawPlatform = function () {
     push()
 
     // Draw main platform body
@@ -97,7 +96,7 @@ function Platform(w, h, x, y, config = {}) {
     strokeWeight(1)
     stroke(141, 84, 48)
 
-    for (const stone of stones) {
+    for (const stone of this.stones) {
       // Draw stones relative to current platform position
       ellipse(this.x + stone.x, this.y + stone.y, stone.w, stone.h)
     }
@@ -134,7 +133,7 @@ function Platform(w, h, x, y, config = {}) {
    * @param {number} gameCharPosY - Game character's y position
    * @returns {boolean} True if character is standing on platform
    */
-  platform.isContact = function (gameCharPosX, gameCharPosY) {
+  this.isContact = function (gameCharPosX, gameCharPosY) {
     if (
       gameCharPosX + 5 > this.x &&
       gameCharPosX - 5 < this.x + this.w &&
@@ -145,6 +144,4 @@ function Platform(w, h, x, y, config = {}) {
     }
     return false
   }
-
-  return platform
 }
