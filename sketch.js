@@ -11,85 +11,140 @@ let projectiles = []
 let collectables = []
 let platforms = []
 let flagpole
+let background
 
 let cameraPosX = 0
 let cameraPosY = 0
-
-// Background elements
-let clouds
-let sharpMountains = []
-let rollingMountainLayers = []
 
 // Input tracking
 let keyStates = {}
 
 // ============= GAME SETUP =============
 function setup() {
-  createCanvas(1024, 720)
+  createCanvas(1224, 620)
   floorPosY = (height * 3) / 4
-  floorWidth = width * 2
+  floorWidth = width * 2 // world width 2448 px
 
   // Initialize game state manager
   gameManager = new GameStateManager()
 
-  // Create collectables
-  initializeCollectables()
-
-  // Create flagpole
-  flagpole = { x_pos: 1900, isReached: false }
+  // Initialize background system
+  background = new Background()
+  background.init(floorPosY, floorWidth, height, width)
 
   // Create platforms using factory pattern
   platforms = [
-    Platform(1124, height - floorPosY, -width, floorPosY),
-    Platform(1410, height - floorPosY, 200, floorPosY),
-    Platform(600, height - floorPosY, 1720, floorPosY),
-    // Additional platforms for more interesting level design
-    // Platform(200, 40, 500, floorPosY - 80),
-    // Platform(200, 40, 600, floorPosY - 180),
-    // Platform(200, 40, 700, floorPosY - 280),
-    // Platform(200, 40, 800, floorPosY - 350),
-    // Platform(200, 40, 900, floorPosY - 450),
-    // // Platform(150, 30, 1300, floorPosY - 120),
+    // stairs + elevator platforms
+    new Platform(120, 40, -floorWidth - 50, floorPosY - 150, {
+      isMoving: true,
+      moveDistance: 100,
+      speed: 0.5,
+      moveDirection: "vertical",
+    }),
+    new Platform(120, 40, -floorWidth + 120, floorPosY - 120),
+    new Platform(150, 50, -floorWidth + 300, floorPosY - 70),
+
+    new Platform(800, height - floorPosY, -floorWidth + 500, floorPosY),
+    new Platform(200, 40, -1050, floorPosY - 80, {
+      isMoving: true,
+      moveDistance: 100,
+      speed: 1,
+    }),
+
+    new Platform(1100, height - floorPosY, -floorWidth + 1700, floorPosY),
+    new Platform(400, height - floorPosY + 100, 450, floorPosY - 25),
+
+    new Platform(200, 40, 900, floorPosY - 70),
+    new Platform(300, 40, 1150, floorPosY - 120),
+    new Platform(150, 40, 1500, floorPosY - 190),
+
+    new Platform(500, height - floorPosY, 1900, floorPosY),
+
+    // interesting moving platforms
+    new Platform(120, 40, 2450, floorPosY - 150, {
+      isMoving: true,
+      moveDistance: 170,
+      speed: 1.5,
+      moveDirection: "vertical",
+    }),
+
+    new Platform(120, 40, 2600, floorPosY - 400, {
+      isMoving: true,
+      moveDistance: 250,
+      speed: 0.9,
+    }),
+
+    new Platform(250, 60, 3200, floorPosY - 250),
+
+    new Platform(800, height - floorPosY, 3700, floorPosY),
+
+    new Platform(1000, height - floorPosY, 4600, floorPosY),
+
+    new Platform(150, 40, 5000, floorPosY - 100),
+    new Platform(150, 40, 5200, floorPosY - 150),
+    new Platform(150, 40, 5400, floorPosY - 200),
+    new Platform(150, 40, 5600, floorPosY - 250),
+    new Platform(150, 40, 5800, floorPosY - 300),
+
+    new Platform(1250, height - floorPosY, 6200, floorPosY),
   ]
 
-  // Create enemies using constructor functions
   initializeEnemies()
 
-  // Initialize background systems
-  initializeSharpMountains()
-  initializeRollingMountains()
-  initializeClouds()
+  initializeCollectables()
+
+  // Create flagpole
+  flagpole = { x_pos: floorWidth + 4600, isReached: false }
 
   startGame()
 }
 
 function initializeEnemies() {
   enemies = [
-    new Enemy(400, floorPosY, 100, "walker"),
-    new Enemy(1000, floorPosY, 150, "walker"),
-    new Enemy(1400, floorPosY - 120, 80, "guard"), // Guard on platform
-    new Enemy(700, floorPosY, 200, "jumper"),
-    new Enemy(1600, floorPosY, 120, "walker"),
+    new Enemy(-floorWidth + 180, floorPosY - 120, 50, "guard"),
+    new Enemy(-floorWidth + 900, floorPosY, 200, "walker"),
+    new Enemy(700, floorPosY, 250, "jumper"),
+    new Enemy(1250, floorPosY - 120, 200, "walker"),
+    new Enemy(1900, floorPosY, 500, "walker"),
+    new Enemy(2000, floorPosY, 500, "guard"),
+    new Enemy(3300, floorPosY - 550, 250, "walker"),
+
+    new Enemy(3700, floorPosY, 500, "jumper"),
+    new Enemy(3800, floorPosY, 500, "guard"),
+
+    new Enemy(5050, floorPosY, 200, "walker"),
+    new Enemy(5250, floorPosY, 250, "jumper"),
+    new Enemy(5280, floorPosY, 500, "walker"),
+    new Enemy(5600, floorPosY, 500, "guard"),
   ]
 }
 
 function initializeCollectables() {
-  const collectablePositions = [
-    { x: 100, y: floorPosY - 30 },
-    { x: 800, y: floorPosY - 30 },
-    { x: 1200, y: floorPosY - 30 },
-    { x: 1500, y: floorPosY - 30 },
-    { x: 1350, y: floorPosY - 100 }, // On platform
-    { x: 650, y: floorPosY - 80 }, // Floating
-  ]
+  collectables = new Collectables([
+    { x: -floorWidth + 20, y: floorPosY - 300, type: "gem" },
+    { x: -floorWidth + 900, y: floorPosY - 30 },
+    { x: -500, y: floorPosY - 30 },
+    { x: 650, y: floorPosY - 50 },
+    { x: 1250, y: floorPosY - 150, type: "powerup" },
+    { x: 2200, y: floorPosY - 20 },
+    { x: 2300, y: floorPosY - 450, type: "gem" },
+    { x: 3300, y: floorPosY - 290, type: "powerup" },
 
-  collectables = new Collectables(collectablePositions)
+    { x: 3800, y: floorPosY - 30 },
+    { x: 4300, y: floorPosY - 30 },
+
+    { x: 5050, y: floorPosY - 130 },
+    { x: 5250, y: floorPosY - 30 },
+    { x: 5280, y: floorPosY - 180, type: "powerup" },
+    { x: 5600, y: floorPosY - 30, type: "gem" },
+  ])
   gameManager.init(collectables.getCount())
 }
 
 function startGame() {
   // Create player using constructor function
-  player = new Player(width / 2, floorPosY, floorPosY)
+  // player = new Player(0, floorPosY, floorPosY)
+  player = new Player(4600, floorPosY - 550, floorPosY)
 
   cameraPosX = 0
   cameraPosY = 0
@@ -108,103 +163,19 @@ function resetGameWorld() {
   flagpole.isReached = false
 
   // Reset collectables
-  initializeCollectables()
-}
-
-// ============= BACKGROUND INITIALIZATION =============
-function initializeSharpMountains() {
-  sharpMountains = [
-    { x_pos: 200, y_pos: floorPosY, height: 400, width: 300 },
-    { x_pos: 600, y_pos: floorPosY, height: 380, width: 240 },
-    { x_pos: 1200, y_pos: floorPosY, height: 240, width: 180 },
-    { x_pos: 1800, y_pos: floorPosY, height: 320, width: 220 },
-    { x_pos: 2400, y_pos: floorPosY, height: 260, width: 190 },
-  ]
-}
-
-function initializeRollingMountains() {
-  rollingMountainLayers = [
-    {
-      color: [97, 165, 151],
-      speed: 0.05,
-      mountains: generateMountainSet(100, 2, 0.2, 0.2),
-    },
-    {
-      color: [59, 146, 128],
-      speed: 0.1,
-      mountains: generateMountainSet(50, 10, 0.1, 0.1),
-    },
-  ]
-}
-
-/**
- * Generates a set of rolling mountains for parallax background
- * @param {number} seed - Random seed for generation
- * @param {number} numMountains - Number of mountains to generate
- * @param {number} minHeightRatio - Minimum height as ratio of canvas height
- * @param {number} maxHeightRatio - Maximum height as ratio of canvas height
- * @returns {Array} Array of mountain objects
- */
-function generateMountainSet(
-  seed,
-  numMountains,
-  minHeightRatio,
-  maxHeightRatio
-) {
-  const mountains = []
-  const spacing = (floorWidth * 1.5) / numMountains
-
-  for (let i = 0; i < numMountains; i++) {
-    const x = i * spacing + Math.sin(seed + i) * spacing * 0.3
-    const width = 200 + Math.cos(seed * 2 + i) * 100
-    const heightRatio =
-      minHeightRatio +
-      (maxHeightRatio - minHeightRatio) * (0.5 + Math.sin(seed + i * 2) * 0.5)
-
-    mountains.push({
-      x: x,
-      width: width,
-      height: height * heightRatio,
-      baseY: floorPosY,
-    })
-  }
-
-  return mountains
-}
-
-function initializeClouds() {
-  clouds = []
-
-  for (let i = 0; i < 25; i++) {
-    const depth = Math.random() * 0.7 + 0.1
-    clouds.push({
-      x_pos: Math.random() * floorWidth * 2 - width,
-      y_pos: Math.random() * 200 + 50,
-      width: (Math.random() * 60 + 60) * depth,
-      height: (Math.random() * 30 + 30) * depth,
-      speed: depth * 0.3,
-      opacity: 150 + depth * 100,
-    })
-  }
+  // initializeCollectables()
 }
 
 // ============= MAIN GAME LOOP =============
 function draw() {
-  // Sky gradient background
-  drawSkyGradient()
+  // Draw background elements first (before camera transform)
 
   push()
 
   // Update and apply camera
+  background.drawAll(cameraPosX, floorPosY, floorWidth, height, width)
   updateCamera()
   translate(-cameraPosX, -cameraPosY)
-
-  // Draw background elements (back to front)
-  drawSun()
-  drawSharpMountains()
-  drawRollingMountains()
-  drawClouds()
-  drawParallaxTrees()
 
   // Update and draw game entities
   updateGameLogic()
@@ -220,32 +191,12 @@ function draw() {
 }
 
 /**
- * Draws the sky gradient background
- */
-function drawSkyGradient() {
-  for (let i = 0; i <= height; i++) {
-    const inter = map(i, 0, height * 0.7, 0, 1)
-    const c = lerpColor(color(35, 206, 235), color(176, 224, 230), inter)
-    stroke(c)
-    line(0, i, width, i)
-  }
-}
-
-/**
  * Updates camera position with smooth following
  */
 function updateCamera() {
   const playerPos = player.getPosition()
   const newCameraPosX = playerPos.x - width / 2
   const newCameraPosY = playerPos.y - height * 0.6
-
-  const minCameraPosX = -width
-  const maxCameraPosX = floorWidth - width
-  const boundedCameraPosX = constrain(
-    newCameraPosX,
-    minCameraPosX,
-    maxCameraPosX
-  )
 
   const minCameraPosY = -height * 0.2
   const maxCameraPosY = 0
@@ -255,7 +206,7 @@ function updateCamera() {
     maxCameraPosY
   )
 
-  cameraPosX = cameraPosX * 0.95 + boundedCameraPosX * 0.05
+  cameraPosX = cameraPosX * 0.95 + newCameraPosX * 0.05
   cameraPosY = cameraPosY * 0.92 + boundedCameraPosY * 0.08
 }
 
@@ -277,6 +228,48 @@ function updateGameLogic() {
   // Update collectables
   collectables.updateAll()
 
+  // Update platforms (for moving platforms)
+  for (const platform of platforms) {
+    if (platform.update) {
+      const movement = platform.update()
+
+      // If platform moved, move entities standing on it
+      if (movement && (movement.deltaX !== 0 || movement.deltaY !== 0)) {
+        // Move player if standing on this platform
+        const playerPos = player.getPosition()
+        if (
+          platform.isContact(playerPos.x, playerPos.y) &&
+          !player.isPlummeting
+        ) {
+          player.setPosition(
+            playerPos.x + movement.deltaX,
+            playerPos.y + movement.deltaY
+          )
+        }
+
+        // Move enemies if standing on this platform
+        for (const enemy of enemies) {
+          if (enemy.isAlive && platform.isContact(enemy.x, enemy.y)) {
+            enemy.x += movement.deltaX
+            enemy.y += movement.deltaY
+            // Update start position for patrol behavior
+            enemy.startX += movement.deltaX
+          }
+        }
+
+        // Move projectiles if they're on this platform
+        for (const projectile of projectiles) {
+          if (platform.isContact(projectile.x, projectile.y)) {
+            projectile.setPosition(
+              projectile.x + movement.deltaX,
+              projectile.y + movement.deltaY
+            )
+          }
+        }
+      }
+    }
+  }
+
   // Update enemies
   for (let i = enemies.length - 1; i >= 0; i--) {
     const enemy = enemies[i]
@@ -295,6 +288,7 @@ function updateGameLogic() {
         return // Game over
       }
       projectiles = [] // Clear all projectiles on level restart
+      resetGameWorld() // Reset enemies and world state
       startGame() // Restart level
       return
     }
@@ -396,6 +390,7 @@ function updateGameLogic() {
       return // Game over
     }
     projectiles = [] // Clear all projectiles on level restart
+    resetGameWorld() // Reset enemies and world state
     startGame() // Restart level
   }
 }
@@ -447,214 +442,6 @@ function drawGameEntities() {
   player.draw()
 }
 
-/**
- * Draws the sun
- */
-function drawSun() {
-  fill(255, 230, 0)
-  noStroke()
-  ellipse(800, 100, 80, 80)
-
-  // Sun rays
-  stroke(255, 230, 0)
-  strokeWeight(3)
-  line(800, 50, 800, 30)
-  line(850, 100, 870, 100)
-  line(800, 150, 800, 170)
-  line(750, 100, 730, 100)
-  noStroke()
-}
-
-// ============= BACKGROUND DRAWING FUNCTIONS =============
-function drawSharpMountains() {
-  push()
-  const parallaxOffset = -cameraPosX * 0.05
-  translate(parallaxOffset, 0)
-
-  for (const mountain of sharpMountains) {
-    for (
-      let offset = -floorWidth;
-      offset <= floorWidth * 2;
-      offset += floorWidth
-    ) {
-      drawSingleSharpMountain(
-        mountain.x_pos + offset,
-        mountain.y_pos,
-        mountain.height,
-        mountain.width
-      )
-    }
-  }
-  pop()
-}
-
-function drawSingleSharpMountain(x, y, h, w) {
-  noStroke()
-
-  // Main peak
-  fill(120, 120, 140, 120)
-  triangle(x, y, x + w / 2, y - h, x + w, y)
-
-  // Secondary peak
-  fill(100, 100, 120)
-  triangle(x - 30, y, x + w / 4, y - h * 0.8, x + 80, y)
-
-  // Snow cap
-  fill(200, 200, 220)
-  triangle(
-    x + w / 2 - 20,
-    y - h + 50,
-    x + w / 2,
-    y - h,
-    x + w / 2 + 20,
-    y - h + 50
-  )
-}
-
-function drawRollingMountains() {
-  for (const layer of rollingMountainLayers) {
-    push()
-    const parallaxOffset = -cameraPosX * layer.speed
-    translate(parallaxOffset, 0)
-    drawMountainSet(layer.color, layer.mountains)
-    pop()
-  }
-}
-
-function drawMountainSet(color, mountains) {
-  fill(color[0], color[1], color[2])
-  noStroke()
-
-  for (const mountain of mountains) {
-    for (
-      let offset = -floorWidth;
-      offset <= floorWidth * 2;
-      offset += floorWidth * 1.5
-    ) {
-      drawSingleRollingMountain(
-        mountain.x + offset,
-        mountain.baseY,
-        mountain.height,
-        mountain.width
-      )
-    }
-  }
-}
-
-function drawSingleRollingMountain(centerX, baseY, peakHeight, mountainWidth) {
-  beginShape()
-  vertex(centerX - mountainWidth, baseY)
-
-  const steps = 20
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps
-    const x = centerX - mountainWidth + t * mountainWidth * 2
-    const heightMultiplier = Math.exp(-Math.pow(t * 4 - 2, 2))
-    const y = baseY - peakHeight * heightMultiplier
-    vertex(x, y)
-  }
-
-  vertex(centerX + mountainWidth, baseY)
-  vertex(centerX + mountainWidth, height)
-  vertex(centerX - mountainWidth, height)
-  endShape(CLOSE)
-}
-
-function drawClouds() {
-  for (const cloud of clouds) {
-    push()
-
-    cloud.x_pos += cloud.speed
-    if (cloud.x_pos > floorWidth + width + 200) {
-      cloud.x_pos = Math.random() * -200 - 200
-      cloud.y_pos = Math.random() * 200 + 50
-    }
-
-    fill(255, 255, 255, cloud.opacity)
-    noStroke()
-
-    ellipse(cloud.x_pos, cloud.y_pos, cloud.width * 0.7, cloud.height)
-    ellipse(
-      cloud.x_pos + 30,
-      cloud.y_pos - 10,
-      cloud.width * 0.6,
-      cloud.height * 1.2
-    )
-    ellipse(cloud.x_pos + 60, cloud.y_pos, cloud.width * 0.8, cloud.height)
-    ellipse(
-      cloud.x_pos + 20,
-      cloud.y_pos + 10,
-      cloud.width * 0.9,
-      cloud.height * 0.8
-    )
-
-    pop()
-  }
-}
-
-function drawParallaxTrees() {
-  // Background trees (slower parallax)
-  const treesX = [300, 400, 600, 800, 900, 1050, 1100, 1300, 1600]
-  push()
-  const bgParallax = -cameraPosX * 0.05
-  translate(bgParallax, 0)
-
-  for (let i = 0; i < treesX.length; i += 2) {
-    drawSingleTree(treesX[i], 0.6, true)
-    drawSingleTree(treesX[i] + floorWidth, 0.6, true)
-    drawSingleTree(treesX[i] - floorWidth, 0.6, true)
-  }
-  pop()
-
-  // Foreground trees (no parallax)
-  push()
-  for (let i = 1; i < treesX.length; i += 2) {
-    drawSingleTree(treesX[i], 1.0, false)
-    drawSingleTree(treesX[i] + floorWidth, 1.0, false)
-    drawSingleTree(treesX[i] - floorWidth, 1.0, false)
-  }
-  pop()
-}
-
-function drawSingleTree(x, scale, isBackground) {
-  push()
-
-  // Tree trunk
-  noStroke()
-  fill(isBackground ? 81 : 101, isBackground ? 54 : 67, isBackground ? 26 : 33)
-  rect(x - 10 * scale, floorPosY - 100 * scale, 20 * scale, 100 * scale)
-
-  // Tree foliage
-  fill(0, isBackground ? 80 : 100, 0)
-
-  triangle(
-    x - 50 * scale,
-    floorPosY - 100 * scale,
-    x,
-    floorPosY - 200 * scale,
-    x + 50 * scale,
-    floorPosY - 100 * scale
-  )
-  triangle(
-    x - 45 * scale,
-    floorPosY - 140 * scale,
-    x,
-    floorPosY - 230 * scale,
-    x + 45 * scale,
-    floorPosY - 140 * scale
-  )
-  triangle(
-    x - 40 * scale,
-    floorPosY - 180 * scale,
-    x,
-    floorPosY - 260 * scale,
-    x + 40 * scale,
-    floorPosY - 180 * scale
-  )
-
-  pop()
-}
-
 function drawFlagpole() {
   stroke(139, 69, 19)
   strokeWeight(8)
@@ -704,6 +491,7 @@ function checkFlagpole() {
  */
 function handleContinuousInput() {
   if (!gameManager.isPlayable()) return
+  if (player.isPlummeting) return
 
   // Movement
   if (keyStates["a"] || keyStates["A"] || keyStates["ArrowLeft"]) {
@@ -745,11 +533,6 @@ function keyPressed() {
   if (key === " ") {
     // Spacebar
     throwStone()
-  }
-
-  // Toggle controls display
-  if (key === "h" || key === "H") {
-    gameManager.toggleControls()
   }
 }
 

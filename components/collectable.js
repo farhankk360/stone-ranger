@@ -242,13 +242,7 @@ function Collectables(positions = []) {
   this.collectables = []
 
   positions.forEach((pos) => {
-    // Occasionally create special collectables
-    let type = "coin"
-    const rand = Math.random()
-    if (rand < 0.05) type = "powerup" // 5% chance for powerup
-    else if (rand < 0.15) type = "gem" // 10% chance for gem
-
-    this.collectables.push(new Collectable(pos.x, pos.y, 40, type))
+    this.collectables.push(new Collectable(pos.x, pos.y, 40, pos.type))
   })
 
   this.updateAll = function () {

@@ -60,13 +60,10 @@ function GameStateManager() {
   /**
    * Awards points and updates score
    * @param {number} points - Points to add
-   * @param {string} reason - Reason for points (for display)
    */
-  this.addScore = function (points, reason = "") {
+  this.addScore = function (points) {
     this.gameScore += points
-    if (reason) {
-      this.showMessage(`+${points} ${reason}`, 60)
-    }
+    this.showMessage(`+${points}`, 60)
   }
 
   /**
@@ -216,23 +213,20 @@ function GameStateManager() {
     textAlign(LEFT)
     text(`Score: ${this.gameScore}`, 20, 30)
 
-    // Level display
-    text(`Level: ${this.level}`, 20, 57)
-
     // Stone inventory display
     fill(0)
     textSize(20)
-    text(`Stones: ${this.stones}/${this.maxStones}`, 20, 85)
+    text(`Stones: ${this.stones}/${this.maxStones}`, 20, 58)
 
     // Lives display with heart shapes
     fill(0)
     textSize(20)
-    text("Lives: ", 20, 115)
+    text("Lives: ", 20, 85)
 
     for (let i = 0; i < this.lives; i++) {
       const size = 16
       const x = 90 + i * 30
-      const y = 110
+      const y = 80
       fill(255, 0, 0)
       beginShape()
       vertex(x, y)
@@ -333,11 +327,6 @@ function GameStateManager() {
     fill(255)
     textSize(30)
     text(`Score: ${this.gameScore}`, width / 2, height / 2)
-
-    // Instructions
-    fill(200)
-    textSize(20)
-    text("Head to the flagpole to finish!", width / 2, height / 2 + 40)
   }
 
   /**

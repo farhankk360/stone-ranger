@@ -32,23 +32,18 @@ function Player(x, y, floorY) {
    * @param {number} floorWidth - Width of the game world
    */
   this.update = function (floorWidth) {
-    // Update animation frame
     this.animationFrame += 0.15
 
-    // Handle horizontal movement
-    if (this.isLeft && this.x > -width) {
+    if (this.isLeft) {
       this.x -= this.speed
     }
 
-    if (this.isRight && this.x < floorWidth) {
+    if (this.isRight) {
       this.x += this.speed
     }
 
-    // Handle falling physics
     if (this.isFalling) {
       this.y += 5
-
-      // Check if fallen off the world
       if (this.y - 5 > this.floorY) {
         this.isPlummeting = true
         this.isLeft = false
@@ -315,6 +310,16 @@ function Player(x, y, floorY) {
    */
   this.getPosition = function () {
     return { x: this.x, y: this.y }
+  }
+
+  /**
+   * Sets the player's position
+   * @param {number} x - New x position
+   * @param {number} y - New y position
+   */
+  this.setPosition = function (x, y) {
+    this.x = x
+    this.y = y
   }
 
   /**

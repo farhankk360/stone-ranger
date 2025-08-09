@@ -28,6 +28,7 @@ function Enemy(x, y, patrolDistance, type = "walker") {
 
   // Physics properties (simplified like player)
   this.isOnGround = false
+  this.jumpCooldown = 0
 
   /**
    * Updates enemy position and AI behavior
@@ -45,16 +46,11 @@ function Enemy(x, y, patrolDistance, type = "walker") {
     this.updatePhysics()
 
     // Then update movement based on current ground state
-    switch (this.type) {
-      case "walker":
-        this.updateWalker()
-        break
-      case "jumper":
-        this.updateWalker() // Jumpers now behave like walkers
-        break
-      case "guard":
-        this.updateGuard()
-        break
+    this.updateWalker()
+
+    // Update jump cooldown
+    if (this.jumpCooldown > 0) {
+      this.jumpCooldown--
     }
 
     return true // Enemy is still active
@@ -90,6 +86,19 @@ function Enemy(x, y, patrolDistance, type = "walker") {
 
     const nextX = this.x + this.speed * this.direction
 
+    if (this.type === "jumper") {
+      // Jump occasionally
+      if (this.jumpCooldown <= 0 && Math.random() < 0.02) {
+        this.y -= 60
+        this.jumpCooldown = 120 // 2 seconds at 60fps
+      }
+
+      // Apply simple gravity
+      if (this.y < floorPosY - 25) {
+        this.y += 3
+      }
+    }
+
     let willBeOnPlatform = false
     for (const platform of platforms) {
       if (platform.isContact(nextX, this.y)) {
@@ -107,14 +116,6 @@ function Enemy(x, y, patrolDistance, type = "walker") {
     } else {
       this.x = nextX
     }
-  }
-
-  /**
-   * Stationary guard behavior - doesn't move much
-   */
-  this.updateGuard = function () {
-    const sway = Math.sin(this.animationFrame * 2) * 2
-    this.x = this.startX + sway
   }
 
   /**
