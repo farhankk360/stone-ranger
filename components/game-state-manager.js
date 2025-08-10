@@ -6,7 +6,7 @@ function GameStateManager() {
   // Game state properties
   this.gameScore = 0
   this.lives = 3
-  this.gameState = "playing" // 'playing', 'gameOver', 'levelComplete', 'paused'
+  this.gameState = "startScreen" // 'startScreen', 'playing', 'gameOver', 'levelComplete', 'paused'
   this.level = 1
   this.maxLives = 5
   this.stones = 5 // Stone inventory
@@ -30,7 +30,7 @@ function GameStateManager() {
   this.init = function (totalCollectablesCount) {
     this.gameScore = 0
     this.lives = 3
-    this.gameState = "playing"
+    this.gameState = "startScreen"
     this.level = 1
     this.stones = 5
     this.enemiesDefeated = 0
@@ -173,16 +173,16 @@ function GameStateManager() {
   }
 
   /**
-   * Restarts the current level
+   * Starts the game from the start screen
    */
-  this.restartLevel = function () {
+  this.startGame = function () {
     this.gameState = "playing"
     this.collectablesFound = 0
     this.enemiesDefeated = 0
     this.stonesThrown = 0
     this.stonesCollected = 0
     this.stones = this.maxStones // Reset stone inventory to full
-    this.showMessage("Level Restarted", 120)
+    this.showMessage("Game Started!", 120)
   }
 
   /**
@@ -260,11 +260,44 @@ function GameStateManager() {
     text(`Music: ${musicStatus} (M to toggle)`, width - 10, 10)
 
     // Game state overlays
-    if (this.gameState === "gameOver") {
+    if (this.gameState === "startScreen") {
+      this.drawStartScreen()
+    } else if (this.gameState === "gameOver") {
       this.drawGameOver()
     } else if (this.gameState === "levelComplete") {
       this.drawLevelComplete()
     }
+  }
+
+  /**
+   * Draws the start screen
+   */
+  this.drawStartScreen = function () {
+    // Semi-transparent background overlay to make game visible underneath
+    fill(0, 0, 0, 180)
+    rect(0, 0, width, height)
+
+    // Main title
+    fill(255, 215, 0) // Gold color
+    stroke(0)
+    strokeWeight(3)
+    textSize(60)
+    textAlign(CENTER, CENTER)
+    text("STONE RANGER", width / 2, height / 2 - 120)
+
+    // Subtitle
+    fill(255)
+    strokeWeight(2)
+    textSize(24)
+    text("2D Platformer Adventure", width / 2, height / 2 - 80)
+
+    // Start instruction - pulsing effect
+    const pulseAlpha = 150 + Math.sin(frameCount * 0.1) * 100
+    fill(255, 255, 0, pulseAlpha)
+    stroke(0, pulseAlpha)
+    strokeWeight(2)
+    textSize(28)
+    text("Press SPACE to Start", width / 2, height / 2 + 100)
   }
 
   /**
@@ -363,6 +396,14 @@ function GameStateManager() {
    */
   this.isPlayable = function () {
     return this.gameState === "playing"
+  }
+
+  /**
+   * Checks if game is on start screen
+   * @returns {boolean} True if on start screen
+   */
+  this.isStartScreen = function () {
+    return this.gameState === "startScreen"
   }
 
   /**

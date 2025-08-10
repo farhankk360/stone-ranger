@@ -1,6 +1,3 @@
-// The Game Project Part 7 - Make it awesome!
-// Modular 2D Platformer with Enemies and Projectiles
-
 // ============= GAME VARIABLES =============
 let floorWidth
 let floorPosY
@@ -118,6 +115,8 @@ function setup() {
   initializeCollectables()
   // Create flagpole
   flagpole = { x_pos: floorWidth + 4600, isReached: false }
+
+  // Start the game immediately so it renders in background
   startGame()
 
   document.getElementById("loading-message").style.display = "none"
@@ -171,8 +170,6 @@ function startGame() {
 
   cameraPosX = 0
   cameraPosY = 0
-
-  gameManager.restartLevel()
 }
 
 // ============= SOUND MANAGEMENT =============
@@ -232,13 +229,15 @@ function draw() {
 
   push()
 
-  // Update and apply camera
+  // Update and apply camera - always render the game
   background.drawAll(cameraPosX, floorPosY, floorWidth, height, width)
   updateCamera()
   translate(-cameraPosX, -cameraPosY)
 
-  // Update and draw game entities
-  updateGameLogic()
+  // Always update and draw game entities (but only update logic if playing)
+  if (gameManager.isPlayable()) {
+    updateGameLogic()
+  }
   drawGameEntities()
 
   pop()
@@ -246,8 +245,10 @@ function draw() {
   // Draw UI (always on top)
   gameManager.drawUI()
 
-  // Handle input
-  handleContinuousInput()
+  // Handle input only if game is playable
+  if (gameManager.isPlayable()) {
+    handleContinuousInput()
+  }
 }
 
 /**
@@ -573,6 +574,9 @@ function drawHouse() {
 }
 
 function checkFlagpole() {
+  // Only check flagpole when game is actually playable
+  if (!gameManager.isPlayable()) return
+
   const playerPos = player.getPosition()
   if (dist(playerPos.x, playerPos.y, flagpole.x_pos, floorPosY) < 50) {
     if (!flagpole.isReached) {
@@ -611,13 +615,38 @@ function handleContinuousInput() {
 function keyPressed() {
   keyStates[key] = true
 
+  // Start screen controls
+  if (gameManager.isStartScreen()) {
+    if (key === " ") {
+      // Spacebar to start game
+      gameManager.startGame()
+      // Start background music on game start
+      if (!bgMusicInitialized) {
+        startBackgroundMusic()
+      }
+    } else if (key === "m" || key === "M") {
+      // Allow music toggle even on start screen
+      if (bgMusicInitialized) {
+        toggleBackgroundMusic()
+      }
+    }
+    return
+  }
+
   // Game state controls
   if (key === "r" || key === "R") {
     if (gameManager.getGameState() === "gameOver") {
       gameManager.resetGame()
       resetGameWorld()
       startGame()
+    } else if (gameManager.getGameState() === "levelComplete") {
+      // Reset game state when restarting after level completion
+      gameManager.startGame()
+      resetGameWorld()
+      startGame()
     } else {
+      // Regular restart during gameplay
+      gameManager.startGame()
       resetGameWorld()
       startGame()
     }
@@ -626,7 +655,9 @@ function keyPressed() {
 
   if (key === "m" || key === "M") {
     // Toggle background music
-    toggleBackgroundMusic()
+    if (bgMusicInitialized) {
+      toggleBackgroundMusic()
+    }
     return
   }
 
