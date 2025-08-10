@@ -6,6 +6,10 @@
 
 ![Stone Ranger Screenshot](resources/stone-ranger-screenshot.jpg)
 
+### See it in action
+
+https://farhankk360.github.io/stone-ranger
+
 ### 🌟 Features
 
 - **🏃 Smooth Platformer Movement** - Responsive WASD/Arrow key controls with fluid animations
