@@ -6,26 +6,22 @@
  * @returns {Object} Player object with update and draw methods
  */
 function Player(x, y, floorY) {
-  // Player state properties
   this.x = x
   this.y = y
   this.floorY = floorY
   this.startX = x
   this.startY = y
 
-  // Movement states
   this.isLeft = false
   this.isRight = false
   this.isFalling = false
   this.isPlummeting = false
 
-  // Movement properties
   this.speed = 5
   this.jumpPower = 125
 
-  // Animation properties
   this.animationFrame = 0
-  this.bodyColor = [255, 152, 0] // Default body color
+  this.bodyColor = [255, 152, 0] // Orange: default body color
 
   /**
    * Updates player position based on input and physics
@@ -71,9 +67,6 @@ function Player(x, y, floorY) {
     }
   }
 
-  /**
-   * Draws player in idle standing position
-   */
   this.drawIdle = function () {
     // Body
     fill(this.bodyColor)
@@ -106,9 +99,6 @@ function Player(x, y, floorY) {
     noStroke()
   }
 
-  /**
-   * Draws player walking left
-   */
   this.drawLeftWalking = function () {
     // Body
     fill(this.bodyColor)
@@ -140,9 +130,6 @@ function Player(x, y, floorY) {
     noStroke()
   }
 
-  /**
-   * Draws player walking right
-   */
   this.drawRightWalking = function () {
     // Body
     fill(this.bodyColor)
@@ -173,9 +160,6 @@ function Player(x, y, floorY) {
     noStroke()
   }
 
-  /**
-   * Draws player falling straight down
-   */
   this.drawFalling = function () {
     // Body
     fill(this.bodyColor)
@@ -208,9 +192,6 @@ function Player(x, y, floorY) {
     noStroke()
   }
 
-  /**
-   * Draws player falling while moving left
-   */
   this.drawLeftFalling = function () {
     // Body
     fill(this.bodyColor)
@@ -240,9 +221,6 @@ function Player(x, y, floorY) {
     noStroke()
   }
 
-  /**
-   * Draws player falling while moving right
-   */
   this.drawRightFalling = function () {
     // Body
     fill(this.bodyColor)
@@ -272,9 +250,6 @@ function Player(x, y, floorY) {
     noStroke()
   }
 
-  /**
-   * Makes the player jump if not already falling
-   */
   this.jump = function () {
     if (!this.isFalling) {
       // Play jump sound if available
@@ -306,17 +281,11 @@ function Player(x, y, floorY) {
     }
   }
 
-  /**
-   * Stops all player movement
-   */
   this.stopMovement = function () {
     this.isLeft = false
     this.isRight = false
   }
 
-  /**
-   * Resets player to starting position and state
-   */
   this.reset = function () {
     this.x = this.startX
     this.y = this.startY

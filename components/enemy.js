@@ -7,7 +7,6 @@
  * @returns {Object} Enemy object with update, draw, and collision methods
  */
 function Enemy(x, y, patrolDistance, type = "walker") {
-  // Enemy properties
   this.startX = x
   this.x = x
   this.y = y
@@ -17,7 +16,6 @@ function Enemy(x, y, patrolDistance, type = "walker") {
   this.deathTimer = 0 // Timer for fade-out effect
   this.maxDeathTimer = 120 // 2 seconds at 60fps
 
-  // Movement properties
   this.speed = 1
   this.direction = 1 // 1 for right, -1 for left
   this.animationFrame = 0
@@ -26,13 +24,9 @@ function Enemy(x, y, patrolDistance, type = "walker") {
   this.width = 30
   this.height = 40
 
-  // Physics properties (simplified like player)
   this.isOnGround = false
   this.jumpCooldown = 0
 
-  /**
-   * Updates enemy position and AI behavior
-   */
   this.update = function () {
     this.animationFrame += 0.1
 
@@ -48,7 +42,6 @@ function Enemy(x, y, patrolDistance, type = "walker") {
     // Then update movement based on current ground state
     this.updateWalker()
 
-    // Update jump cooldown
     if (this.jumpCooldown > 0) {
       this.jumpCooldown--
     }
@@ -145,9 +138,6 @@ function Enemy(x, y, patrolDistance, type = "walker") {
     pop()
   }
 
-  /**
-   * Draws a basic walking enemy
-   */
   this.drawWalker = function () {
     // Body
     fill(220, 20, 60) // Crimson
@@ -173,9 +163,6 @@ function Enemy(x, y, patrolDistance, type = "walker") {
     ellipse(this.direction > 0 ? -8 : 8, -25, 5, 15)
   }
 
-  /**
-   * Draws a jumping enemy
-   */
   this.drawJumper = function () {
     // Body (more elongated for jumping)
     fill(60, 180, 75) // Green
@@ -200,9 +187,6 @@ function Enemy(x, y, patrolDistance, type = "walker") {
     ellipse(this.direction > 0 ? -6 : 6, -20, 4, 12)
   }
 
-  /**
-   * Draws a guard enemy
-   */
   this.drawGuard = function () {
     // Body (larger, more imposing)
     fill(128, 64, 0) // Brown
@@ -293,7 +277,6 @@ function Enemy(x, y, patrolDistance, type = "walker") {
   this.kill = function () {
     this.isAlive = false
 
-    // Play enemy death sound if available
     if (typeof enemyDieSound !== "undefined" && enemyDieSound) {
       enemyDieSound.play()
     }
@@ -320,9 +303,6 @@ function Enemy(x, y, patrolDistance, type = "walker") {
     }
   }
 
-  /**
-   * Resets enemy to initial state
-   */
   this.reset = function () {
     this.x = this.startX
     this.y = floorPosY

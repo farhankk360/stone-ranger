@@ -32,7 +32,6 @@ let bgMusicInitialized = false
 
 // ============= PRELOAD FUNCTION =============
 function preload() {
-  // Specify sound formats
   soundFormats("mp3", "wav", "ogg")
 
   // Load all sound files
@@ -61,12 +60,10 @@ function setup() {
   createCanvas(1224, 620)
   floorPosY = (height * 3) / 4
   floorWidth = width * 2 // world width 2448 px
-  // Initialize game state manager
+
   gameManager = new GameStateManager()
-  // Initialize background system
   background = new Background()
   background.init(floorPosY, floorWidth, height, width)
-  // Create platforms using factory pattern
   platforms = [
     // stairs + elevator platforms
     new Platform(120, 40, -floorWidth - 50, floorPosY - 150, {
@@ -113,10 +110,9 @@ function setup() {
   ]
   initializeEnemies()
   initializeCollectables()
-  // Create flagpole
+
   flagpole = { x_pos: floorWidth + 4600, isReached: false }
 
-  // Start the game immediately so it renders in background
   startGame()
 
   document.getElementById("loading-message").style.display = "none"
@@ -165,7 +161,6 @@ function initializeCollectables() {
 }
 
 function startGame() {
-  // Create player using constructor function
   player = new Player(0, floorPosY, floorPosY)
 
   cameraPosX = 0
@@ -203,9 +198,6 @@ function toggleBackgroundMusic() {
   }
 }
 
-/**
- * Plays victory music when level is complete
- */
 function playVictoryMusic() {
   if (currentBgMusic && currentBgMusic.isPlaying()) {
     currentBgMusic.stop()
@@ -213,28 +205,21 @@ function playVictoryMusic() {
 }
 
 function resetGameWorld() {
-  // Reset all projectiles
   projectiles = []
 
-  // Reset all enemies to initial state
   initializeEnemies()
 
-  // Reset flagpole
   flagpole.isReached = false
 }
 
 // ============= MAIN GAME LOOP =============
 function draw() {
-  // Draw background elements first (before camera transform)
-
   push()
 
-  // Update and apply camera - always render the game
   background.drawAll(cameraPosX, floorPosY, floorWidth, height, width)
   updateCamera()
   translate(-cameraPosX, -cameraPosY)
 
-  // Always update and draw game entities (but only update logic if playing)
   if (gameManager.isPlayable()) {
     updateGameLogic()
   }
@@ -242,10 +227,8 @@ function draw() {
 
   pop()
 
-  // Draw UI (always on top)
   gameManager.drawUI()
 
-  // Handle input only if game is playable
   if (gameManager.isPlayable()) {
     handleContinuousInput()
   }
@@ -253,6 +236,7 @@ function draw() {
 
 /**
  * Updates camera position with smooth following
+ * inspired by https://editor.p5js.org/prashanth_thattai/sketches/0CpHXgceE
  */
 function updateCamera() {
   const playerPos = player.getPosition()
@@ -271,22 +255,15 @@ function updateCamera() {
   cameraPosY = cameraPosY * 0.92 + boundedCameraPosY * 0.08
 }
 
-/**
- * Updates all game logic
- */
 function updateGameLogic() {
   if (!gameManager.isPlayable()) return
 
-  // Update game manager
   gameManager.update()
 
-  // Update player physics and platform collision
   updatePlayerPhysics()
 
-  // Update player
   player.update(floorWidth)
 
-  // Update collectables
   collectables.updateAll()
 
   // Update platforms (for moving platforms)
@@ -344,7 +321,6 @@ function updateGameLogic() {
 
     // Check enemy-player collision (only if enemy is alive)
     if (enemy.isAlive && enemy.checkPlayerCollision(player)) {
-      // Play player death sound
       if (typeof playerDieSound !== "undefined" && playerDieSound) {
         playerDieSound.play()
       }
@@ -352,9 +328,9 @@ function updateGameLogic() {
         projectiles = [] // Clear all projectiles on game over
         return // Game over
       }
-      projectiles = [] // Clear all projectiles on level restart
-      resetGameWorld() // Reset enemies and world state
-      startGame() // Restart level
+      projectiles = []
+      resetGameWorld()
+      startGame()
       return
     }
   }
@@ -445,28 +421,23 @@ function updateGameLogic() {
     gameManager.collectableFound(collection.points)
   }
 
-  // Check flagpole
   checkFlagpole()
 
   // Check if player fell off world
   if (player.hasFallenOffWorld(height)) {
-    // Play player death sound
     if (typeof playerDieSound !== "undefined" && playerDieSound) {
       playerDieSound.play()
     }
     if (gameManager.loseLife()) {
-      projectiles = [] // Clear all projectiles on game over
-      return // Game over
+      projectiles = []
+      return
     }
-    projectiles = [] // Clear all projectiles on level restart
-    resetGameWorld() // Reset enemies and world state
-    startGame() // Restart level
+    projectiles = []
+    resetGameWorld()
+    startGame()
   }
 }
 
-/**
- * Updates player physics and platform collision detection
- */
 function updatePlayerPhysics() {
   player.setFalling(true)
 
@@ -482,9 +453,6 @@ function updatePlayerPhysics() {
   }
 }
 
-/**
- * Draws all game entities
- */
 function drawGameEntities() {
   // Draw platforms
   for (const platform of platforms) {
@@ -559,7 +527,7 @@ function drawHouse() {
     floorPosY - 150
   )
 
-  // // Body
+  // Body
   fill(255, 222, 173) // Light beige
   rect(flagpole.x_pos + 100, floorPosY - 150, 200, 150)
 
@@ -574,18 +542,16 @@ function drawHouse() {
 }
 
 function checkFlagpole() {
-  // Only check flagpole when game is actually playable
   if (!gameManager.isPlayable()) return
 
   const playerPos = player.getPosition()
   if (dist(playerPos.x, playerPos.y, flagpole.x_pos, floorPosY) < 50) {
     if (!flagpole.isReached) {
       flagpole.isReached = true
-      // Play victory sound effect
       if (typeof victorySound !== "undefined" && victorySound) {
         victorySound.play()
       }
-      playVictoryMusic() // Switch to victory music
+      playVictoryMusic()
       gameManager.completeLevel()
     }
   }
@@ -620,7 +586,6 @@ function keyPressed() {
     if (key === " ") {
       // Spacebar to start game
       gameManager.startGame()
-      // Start background music on game start
       if (!bgMusicInitialized) {
         startBackgroundMusic()
       }
@@ -654,7 +619,6 @@ function keyPressed() {
   }
 
   if (key === "m" || key === "M") {
-    // Toggle background music
     if (bgMusicInitialized) {
       toggleBackgroundMusic()
     }
@@ -663,7 +627,6 @@ function keyPressed() {
 
   if (!gameManager.isPlayable()) return
 
-  // Start background music on first user interaction (browser requirement)
   if (!bgMusicInitialized) {
     startBackgroundMusic()
   }
@@ -684,9 +647,6 @@ function keyReleased() {
   keyStates[key] = false
 }
 
-/**
- * Creates and throws a stone projectile
- */
 function throwStone() {
   const playerPos = player.getPosition()
 

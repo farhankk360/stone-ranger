@@ -12,7 +12,6 @@
  * @returns {Object} Platform object with drawPlatform, isContact, and update methods
  */
 function Platform(w, h, x, y, config = {}) {
-  // Platform properties
   this.w = w
   this.h = h
   this.x = x
@@ -20,7 +19,6 @@ function Platform(w, h, x, y, config = {}) {
   this.startX = x
   this.startY = y
 
-  // Movement properties
   this.isMoving = config.isMoving || false
   this.moveDistance = config.moveDistance || 100
   this.speed = config.speed || 1
@@ -32,7 +30,7 @@ function Platform(w, h, x, y, config = {}) {
   for (let i = 0; i < 15; i++) {
     this.stones.push({
       x: Math.random() * (this.w - 34) + 10, // Relative to platform
-      y: Math.random() * (this.h - 34) + 10, // Relative to platform
+      y: Math.random() * (this.h - 34) + 10,
       w: Math.random() * 12 + 12,
       h: Math.random() * 12 + 12,
     })

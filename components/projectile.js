@@ -12,7 +12,6 @@ function Projectile(x, y, direction, power = 1) {
   this.startX = x
   this.startY = y
 
-  // Physics props
   this.velocityX = direction * (8 + power * 2) // Horizontal speed
   this.velocityY = -6 - power // Initial upward velocity (negative is up)
   this.gravity = 0.3
@@ -31,14 +30,10 @@ function Projectile(x, y, direction, power = 1) {
   this.trail = []
   this.maxTrailLength = 8
 
-  // Play stone throw sound when projectile is created
   if (typeof stoneThrowSound !== "undefined" && stoneThrowSound) {
     stoneThrowSound.play()
   }
 
-  /**
-   * Updates projectile physics and position
-   */
   this.update = function () {
     if (!this.isActive) return
 
@@ -205,9 +200,6 @@ function Projectile(x, y, direction, power = 1) {
     }
   }
 
-  /**
-   * Draws the stone projectile with realistic texture
-   */
   this.drawStone = function () {
     const velocity = this.getVelocity()
     const speed = Math.sqrt(
@@ -260,9 +252,6 @@ function Projectile(x, y, direction, power = 1) {
     return distance < this.size / 2 + targetRadius
   }
 
-  /**
-   * Deactivates the projectile (removes it from play)
-   */
   this.destroy = function () {
     this.isActive = false
   }

@@ -3,7 +3,6 @@
  * Handles sky, sun, mountains, clouds, and trees
  */
 function Background() {
-  // Background element arrays
   this.clouds = []
   this.sharpMountains = []
   this.rollingMountainLayers = []
@@ -27,9 +26,6 @@ function Background() {
     this.initializeClouds()
   }
 
-  /**
-   * Initialize sharp mountain data
-   */
   this.initializeSharpMountains = function () {
     this.sharpMountains = [
       { x_pos: 200, y_pos: this.floorPosY, height: 400, width: 300 },
@@ -93,9 +89,6 @@ function Background() {
     return mountains
   }
 
-  /**
-   * Initialize cloud data
-   */
   this.initializeClouds = function () {
     this.clouds = []
 
@@ -126,9 +119,6 @@ function Background() {
     this.drawRiver()
   }
 
-  /**
-   * Draws the sky gradient background
-   */
   this.drawSkyGradient = function () {
     for (let i = 0; i <= this.height; i++) {
       const inter = map(i, 0, this.height * 0.7, 0, 1)
@@ -138,9 +128,6 @@ function Background() {
     }
   }
 
-  /**
-   * Draws the sun
-   */
   this.drawSun = function () {
     const x = 900
     const y = 100
@@ -392,9 +379,6 @@ function Background() {
     pop()
   }
 
-  /**
-   * Draws a simple river
-   */
   this.drawRiver = function () {
     fill(115, 216, 198, 150)
     noStroke()

@@ -15,9 +15,6 @@ function Collectable(x, y, size = 40, type = "coin") {
   this.bobOffset = Math.random() * TWO_PI // Random start for bobbing animation
   this.sparkles = []
 
-  /**
-   * Updates collectable animations
-   */
   this.update = function () {
     if (this.isFound) return
 
@@ -45,9 +42,6 @@ function Collectable(x, y, size = 40, type = "coin") {
     }
   }
 
-  /**
-   * Draws a collectable if not yet found
-   */
   this.draw = function () {
     if (this.isFound) return
 
@@ -78,9 +72,6 @@ function Collectable(x, y, size = 40, type = "coin") {
     pop()
   }
 
-  /**
-   * Draws sparkle effects around collectable
-   */
   this.drawSparkles = function () {
     for (const sparkle of this.sparkles) {
       const alpha = map(sparkle.life, 0, sparkle.maxLife, 0, 255)
@@ -89,7 +80,6 @@ function Collectable(x, y, size = 40, type = "coin") {
       fill(255, 255, 255, alpha)
       noStroke()
 
-      // Draw sparkle as a small star
       this.drawStar(sparkle.x - this.x_pos, sparkle.y - this.y_pos, size)
     }
   }
@@ -173,7 +163,6 @@ function Collectable(x, y, size = 40, type = "coin") {
    * @param {number} size - Size of the powerup
    */
   this.drawPowerup = function (size) {
-    // Powerup body (star shape)
     fill(255, 20, 147) // Deep pink
     stroke(139, 0, 69)
     strokeWeight(2)

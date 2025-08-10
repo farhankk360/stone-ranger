@@ -3,23 +3,20 @@
  * @returns {Object} GameStateManager object with state management methods
  */
 function GameStateManager() {
-  // Game state properties
   this.gameScore = 0
   this.lives = 3
   this.gameState = "startScreen" // 'startScreen', 'playing', 'gameOver', 'levelComplete', 'paused'
   this.level = 1
   this.maxLives = 5
-  this.stones = 5 // Stone inventory
+  this.stones = 5
   this.maxStones = 5
 
-  // Statistics tracking
   this.enemiesDefeated = 0
   this.stonesThrown = 0
   this.stonesCollected = 0
   this.collectablesFound = 0
   this.totalCollectables = 0
 
-  // UI properties
   this.messageTimer = 0
   this.currentMessage = ""
 
@@ -42,11 +39,7 @@ function GameStateManager() {
     this.currentMessage = ""
   }
 
-  /**
-   * Updates game manager state (call every frame)
-   */
   this.update = function () {
-    // Update message timer
     if (this.messageTimer > 0) {
       this.messageTimer--
     }
@@ -137,9 +130,6 @@ function GameStateManager() {
     return false
   }
 
-  /**
-   * Collects a stone (adds to inventory)
-   */
   this.stoneCollected = function () {
     if (this.stones < this.maxStones) {
       this.stones++
@@ -316,9 +306,6 @@ function GameStateManager() {
     noStroke()
   }
 
-  /**
-   * Draws game over screen
-   */
   this.drawGameOver = function () {
     // Semi-transparent overlay
     fill(0, 0, 0, 150)
@@ -354,21 +341,15 @@ function GameStateManager() {
     text("Press R to Restart", width / 2, height / 2 + 120)
   }
 
-  /**
-   * Draws level complete screen
-   */
   this.drawLevelComplete = function () {
-    // Semi-transparent overlay
     fill(0, 255, 0, 100)
     rect(0, 0, width, height)
 
-    // Level complete text
     fill(0, 255, 0)
     textSize(50)
     textAlign(CENTER, CENTER)
     text("Level Complete!", width / 2, height / 2 - 60)
 
-    // Score
     fill(255)
     textSize(30)
     text(`Score: ${this.gameScore}`, width / 2, height / 2)
