@@ -1,4 +1,4 @@
-# 🎮 Stone Ranger
+# Stone Ranger
 
 ## 2D Platformer Adventure Game
 
