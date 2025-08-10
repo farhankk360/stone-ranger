@@ -214,6 +214,12 @@ function Collectable(x, y, size = 40, type = "coin") {
 
     if (distance < collectionDistance) {
       this.isFound = true
+
+      // Play coin collection sound if available
+      if (typeof coinSound !== "undefined" && coinSound) {
+        coinSound.play()
+      }
+
       return true
     }
 

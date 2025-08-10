@@ -19,19 +19,56 @@ let cameraPosY = 0
 // Input tracking
 let keyStates = {}
 
+// ============= SOUND VARIABLES =============
+let bgAtmosphereWind
+let bgMusic
+let jumpSound
+let coinSound
+let enemyDieSound
+let playerDieSound
+let stoneThrowSound
+let victorySound
+
+// Sound management
+let currentBgMusic = null
+let bgMusicInitialized = false
+
+// ============= PRELOAD FUNCTION =============
+function preload() {
+  // Specify sound formats
+  soundFormats("mp3", "wav", "ogg")
+
+  // Load all sound files
+  bgAtmosphereWind = loadSound("resources/bg-wind.mp3")
+  bgMusic = loadSound("resources/the-real-champion-sound-farhankk360.mp3")
+  jumpSound = loadSound("resources/player-jump.wav")
+  coinSound = loadSound("resources/coin-collected.wav")
+  enemyDieSound = loadSound("resources/enemy-die.wav")
+  playerDieSound = loadSound("resources/player-die.wav")
+  stoneThrowSound = loadSound("resources/stone-throw.wav")
+  victorySound = loadSound("resources/victory.ogg")
+
+  // Set initial volumes
+  bgAtmosphereWind.setVolume(0.2)
+  bgMusic.setVolume(0.3)
+  jumpSound.setVolume(0.3)
+  coinSound.setVolume(0.4)
+  enemyDieSound.setVolume(0.5)
+  playerDieSound.setVolume(0.5)
+  stoneThrowSound.setVolume(0.3)
+  victorySound.setVolume(0.7)
+}
+
 // ============= GAME SETUP =============
 function setup() {
   createCanvas(1224, 620)
   floorPosY = (height * 3) / 4
   floorWidth = width * 2 // world width 2448 px
-
   // Initialize game state manager
   gameManager = new GameStateManager()
-
   // Initialize background system
   background = new Background()
   background.init(floorPosY, floorWidth, height, width)
-
   // Create platforms using factory pattern
   platforms = [
     // stairs + elevator platforms
@@ -43,60 +80,47 @@ function setup() {
     }),
     new Platform(120, 40, -floorWidth + 120, floorPosY - 120),
     new Platform(150, 50, -floorWidth + 300, floorPosY - 70),
-
     new Platform(800, height - floorPosY, -floorWidth + 500, floorPosY),
     new Platform(200, 40, -1050, floorPosY - 80, {
       isMoving: true,
       moveDistance: 100,
       speed: 1,
     }),
-
     new Platform(1100, height - floorPosY, -floorWidth + 1700, floorPosY),
     new Platform(400, height - floorPosY + 100, 450, floorPosY - 25),
-
     new Platform(200, 40, 900, floorPosY - 70),
     new Platform(300, 40, 1150, floorPosY - 120),
     new Platform(150, 40, 1500, floorPosY - 180),
-
     new Platform(500, height - floorPosY, 1900, floorPosY),
-
     // interesting moving platforms
-    new Platform(120, 40, 2450, floorPosY - 150, {
+    new Platform(120, 40, 2450, floorPosY - 200, {
       isMoving: true,
-      moveDistance: 170,
+      moveDistance: 150,
       speed: 1.5,
       moveDirection: "vertical",
     }),
-
     new Platform(120, 40, 2600, floorPosY - 400, {
       isMoving: true,
       moveDistance: 250,
       speed: 0.9,
     }),
-
     new Platform(250, 60, 3200, floorPosY - 250),
-
     new Platform(800, height - floorPosY, 3700, floorPosY),
-
     new Platform(1000, height - floorPosY, 4600, floorPosY),
-
     new Platform(150, 40, 5000, floorPosY - 100),
     new Platform(150, 40, 5200, floorPosY - 150),
     new Platform(150, 40, 5400, floorPosY - 200),
     new Platform(150, 40, 5600, floorPosY - 250),
     new Platform(150, 40, 5800, floorPosY - 300),
-
     new Platform(1250, height - floorPosY, 6200, floorPosY),
   ]
-
   initializeEnemies()
-
   initializeCollectables()
-
   // Create flagpole
   flagpole = { x_pos: floorWidth + 4600, isReached: false }
-
   startGame()
+
+  document.getElementById("loading-message").style.display = "none"
 }
 
 function initializeEnemies() {
@@ -151,6 +175,46 @@ function startGame() {
   gameManager.restartLevel()
 }
 
+// ============= SOUND MANAGEMENT =============
+
+function startBackgroundMusic() {
+  if (currentBgMusic && currentBgMusic.isPlaying()) {
+    currentBgMusic.stop()
+    bgMusic.stop()
+  }
+
+  // Ensure audio context is started (browser requirement)
+  if (getAudioContext().state !== "running") {
+    getAudioContext().resume()
+  }
+
+  currentBgMusic = bgAtmosphereWind
+  if (!bgAtmosphereWind.isPlaying()) {
+    bgAtmosphereWind.loop()
+    bgMusic.loop()
+    bgMusicInitialized = true
+  }
+}
+
+function toggleBackgroundMusic() {
+  if (currentBgMusic && currentBgMusic.isPlaying()) {
+    currentBgMusic.pause()
+    bgMusic.pause()
+  } else {
+    currentBgMusic.play()
+    bgMusic.play()
+  }
+}
+
+/**
+ * Plays victory music when level is complete
+ */
+function playVictoryMusic() {
+  if (currentBgMusic && currentBgMusic.isPlaying()) {
+    currentBgMusic.stop()
+  }
+}
+
 function resetGameWorld() {
   // Reset all projectiles
   projectiles = []
@@ -160,9 +224,6 @@ function resetGameWorld() {
 
   // Reset flagpole
   flagpole.isReached = false
-
-  // Reset collectables
-  // initializeCollectables()
 }
 
 // ============= MAIN GAME LOOP =============
@@ -282,6 +343,10 @@ function updateGameLogic() {
 
     // Check enemy-player collision (only if enemy is alive)
     if (enemy.isAlive && enemy.checkPlayerCollision(player)) {
+      // Play player death sound
+      if (typeof playerDieSound !== "undefined" && playerDieSound) {
+        playerDieSound.play()
+      }
       if (gameManager.loseLife()) {
         projectiles = [] // Clear all projectiles on game over
         return // Game over
@@ -384,6 +449,10 @@ function updateGameLogic() {
 
   // Check if player fell off world
   if (player.hasFallenOffWorld(height)) {
+    // Play player death sound
+    if (typeof playerDieSound !== "undefined" && playerDieSound) {
+      playerDieSound.play()
+    }
     if (gameManager.loseLife()) {
       projectiles = [] // Clear all projectiles on game over
       return // Game over
@@ -508,6 +577,11 @@ function checkFlagpole() {
   if (dist(playerPos.x, playerPos.y, flagpole.x_pos, floorPosY) < 50) {
     if (!flagpole.isReached) {
       flagpole.isReached = true
+      // Play victory sound effect
+      if (typeof victorySound !== "undefined" && victorySound) {
+        victorySound.play()
+      }
+      playVictoryMusic() // Switch to victory music
       gameManager.completeLevel()
     }
   }
@@ -550,7 +624,18 @@ function keyPressed() {
     return
   }
 
+  if (key === "m" || key === "M") {
+    // Toggle background music
+    toggleBackgroundMusic()
+    return
+  }
+
   if (!gameManager.isPlayable()) return
+
+  // Start background music on first user interaction (browser requirement)
+  if (!bgMusicInitialized) {
+    startBackgroundMusic()
+  }
 
   // Jump
   if (key === "w" || key === "W" || keyCode === UP_ARROW) {

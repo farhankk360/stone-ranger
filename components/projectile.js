@@ -31,6 +31,11 @@ function Projectile(x, y, direction, power = 1) {
   this.trail = []
   this.maxTrailLength = 8
 
+  // Play stone throw sound when projectile is created
+  if (typeof stoneThrowSound !== "undefined" && stoneThrowSound) {
+    stoneThrowSound.play()
+  }
+
   /**
    * Updates projectile physics and position
    */

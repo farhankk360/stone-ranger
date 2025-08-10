@@ -3,8 +3,54 @@
   <head>
     <title>Stone Ranger | 2D Platformer Adventure using p5.js</title>
 
+    <!-- SEO Meta Tags -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Stone Ranger - An exciting 2D platformer adventure game built with p5.js. Jump, collect coins, defeat enemies, and throw stones in this immersive browser-based gaming experience."
+    />
+    <meta
+      name="keywords"
+      content="2D platformer, p5.js game, browser game, adventure game, Stone Ranger, HTML5 game"
+    />
+    <meta name="author" content="Farhan (farhankk360)" />
+
+    <!-- Open Graph Meta Tags for Social Media -->
+    <meta
+      property="og:title"
+      content="Stone Ranger | 2D Platformer Adventure"
+    />
+    <meta
+      property="og:description"
+      content="An exciting 2D platformer adventure game built with p5.js. Jump, collect coins, defeat enemies, and throw stones!"
+    />
+    <meta property="og:image" content="resources/stone-ranger-screenshot.jpg" />
+    <meta
+      property="og:image:alt"
+      content="Stone Ranger game screenshot showing the platformer gameplay"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Stone Ranger | 2D Platformer Adventure"
+    />
+    <meta
+      name="twitter:description"
+      content="An exciting 2D platformer adventure game built with p5.js. Jump, collect coins, defeat enemies, and throw stones!"
+    />
+    <meta
+      name="twitter:image"
+      content="resources/stone-ranger-screenshot.jpg"
+    />
+
     <!-- Load p5.js library first -->
     <script src="p5.min.js"></script>
+    <script src="p5.sound.min.js"></script>
 
     <!-- Load game components in dependency order -->
     <script src="components/platform.js"></script>
@@ -56,7 +102,19 @@
         font-size: 12px;
       }
 
+      #loading-message {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+        color: #ecf0f1;
+      }
+
       footer {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
         text-align: center;
         margin-bottom: 20px;
         font-family: monospace;
@@ -67,16 +125,35 @@
   </head>
   <body>
     <main>
-      <div class="game-info">Stone Ranger | 2D Platformer Adventure</div>
+      <div class="game-info">
+        Stone Ranger | 2D Platformer Adventure (p5.js)
+      </div>
       <div id="game-container"></div>
       <div class="controls-hint">
         WASD/Arrows: Move | Move + Space: Throw Stones | R: Restart
       </div>
+
+      <div id="loading-message">
+        <p style="font-size: 18px; font-weight: bold">Loading game assets...</p>
+        <p style="font-size: 12px">
+          Please wait while the game loads. This may take a few seconds.
+        </p>
+      </div>
     </main>
 
     <footer>
-      Made with <i>🎹</i> & <i>🖤</i> by
-      <a href="http://github.com/farhankk360" target="_blank">Farhan</a>
+      <div>
+        Made with <i>🎹</i> & <i>🖤</i> by
+        <a href="http://github.com/farhankk360" target="_blank"
+          >Farhan (farhankk360)</a
+        >
+      </div>
+      <div>
+        Background music:
+        <a href="https://www.youtube.com/watch?v=Bmhb-YCEUMQ" target="_blank"
+          >The Real Champion Sound</a
+        >
+      </div>
     </footer>
   </body>
 </html>

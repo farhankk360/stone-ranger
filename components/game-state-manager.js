@@ -247,6 +247,18 @@ function GameStateManager() {
       this.drawMessage()
     }
 
+    // Sound controls (bottom right)
+    fill(0, 0, 0, 150)
+    textAlign(RIGHT)
+    textSize(12)
+    const musicStatus =
+      typeof currentBgMusic !== "undefined" &&
+      currentBgMusic &&
+      currentBgMusic.isPlaying()
+        ? "ON"
+        : "OFF"
+    text(`Music: ${musicStatus} (M to toggle)`, width - 10, 10)
+
     // Game state overlays
     if (this.gameState === "gameOver") {
       this.drawGameOver()

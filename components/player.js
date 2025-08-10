@@ -89,10 +89,15 @@ function Player(x, y, floorY) {
     ellipse(this.x + 5, this.y - 45, 4, 4)
 
     // Arms
-    stroke(this.bodyColor)
+    stroke(220, 131, 1)
     strokeWeight(4)
     line(this.x - 10, this.y - 30, this.x - 15, this.y - 20)
     line(this.x + 10, this.y - 30, this.x + 15, this.y - 20)
+    noStroke()
+    // small ellipse for hands
+    stroke(255, 200, 150)
+    ellipse(this.x - 15, this.y - 20, 1, 1)
+    ellipse(this.x + 15, this.y - 20, 1, 1)
 
     // Legs
     stroke(100, 100, 255)
@@ -118,9 +123,14 @@ function Player(x, y, floorY) {
     ellipse(this.x - 10, this.y - 45, 4, 4)
 
     // Arms
-    stroke(this.bodyColor)
+    stroke(220, 131, 1)
     strokeWeight(4)
     line(this.x - 2, this.y - 30, this.x - 12, this.y - 20)
+
+    // small ellipse for hands
+    noStroke()
+    stroke(255, 200, 150)
+    ellipse(this.x - 12, this.y - 20, 1, 1)
 
     // Legs (walking animation with foot tapping effect)
     stroke(100, 100, 255)
@@ -147,9 +157,13 @@ function Player(x, y, floorY) {
     ellipse(this.x + 10, this.y - 45, 4, 4)
 
     // Arms
-    stroke(this.bodyColor)
+    stroke(220, 131, 1)
     strokeWeight(4)
     line(this.x + 2, this.y - 30, this.x + 12, this.y - 20)
+    // small ellipse for hands
+    noStroke()
+    stroke(255, 200, 150)
+    ellipse(this.x + 12, this.y - 20, 1, 1)
 
     // Legs (walking animation with foot tapping effect)
     stroke(100, 100, 255)
@@ -177,10 +191,15 @@ function Player(x, y, floorY) {
     ellipse(this.x + 5, this.y - 50, 4, 4)
 
     // Arms (spread out for balance)
-    stroke(this.bodyColor)
+    stroke(220, 131, 1)
     strokeWeight(4)
     line(this.x - 10, this.y - 35, this.x - 15, this.y - 45)
     line(this.x + 10, this.y - 35, this.x + 15, this.y - 45)
+    noStroke()
+    // small ellipse for hands
+    stroke(255, 200, 150)
+    ellipse(this.x - 15, this.y - 45, 1, 1)
+    ellipse(this.x + 15, this.y - 45, 1, 1)
 
     // Legs (spread out)
     stroke(100, 100, 255)
@@ -206,9 +225,13 @@ function Player(x, y, floorY) {
     ellipse(this.x - 10, this.y - 50, 4, 4)
 
     // Arms (flailing)
-    stroke(this.bodyColor)
+    stroke(220, 131, 1)
     strokeWeight(4)
     line(this.x - 2, this.y - 35, this.x - 15, this.y - 40)
+    noStroke()
+    // small ellipse for hands
+    stroke(255, 200, 150)
+    ellipse(this.x - 15, this.y - 40, 1, 1)
 
     // Legs (flailing)
     stroke(100, 100, 255)
@@ -234,9 +257,13 @@ function Player(x, y, floorY) {
     ellipse(this.x + 10, this.y - 50, 4, 4)
 
     // Arms (flailing)
-    stroke(this.bodyColor)
+    stroke(220, 131, 1)
     strokeWeight(4)
     line(this.x + 2, this.y - 35, this.x + 15, this.y - 40)
+    noStroke()
+    // small ellipse for hands
+    stroke(255, 200, 150)
+    ellipse(this.x + 15, this.y - 40, 1, 1)
 
     // Legs (flailing)
     stroke(100, 100, 255)
@@ -250,6 +277,10 @@ function Player(x, y, floorY) {
    */
   this.jump = function () {
     if (!this.isFalling) {
+      // Play jump sound if available
+      if (typeof jumpSound !== "undefined" && jumpSound) {
+        jumpSound.play()
+      }
       this.y -= this.jumpPower
     }
   }

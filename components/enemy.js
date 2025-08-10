@@ -292,6 +292,11 @@ function Enemy(x, y, patrolDistance, type = "walker") {
    */
   this.kill = function () {
     this.isAlive = false
+
+    // Play enemy death sound if available
+    if (typeof enemyDieSound !== "undefined" && enemyDieSound) {
+      enemyDieSound.play()
+    }
   }
 
   /**
